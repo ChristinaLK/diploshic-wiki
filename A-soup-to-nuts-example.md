@@ -26,4 +26,17 @@ discoal 162 2000 55000 -Pt 1750.204699 17502.046985 -Pre 19252.251684 57756.7550
 This is a bit ugly because of all the `-en` flags which specify the demographic size change history of the BFS sample. Ignore those for a minute and instead focus on the options before and after the demography. In particular you can see that `-x 0.5` has been given indicating that the hard sweep is at the middle of our simulated region. If instead we look in `hard_0.msOut.gz` there we set `-x 0.045454545454545456` indicating that the sweep occurred at the center of the leftmost subwindow.
 
 Hopefully this simulation output will give you a very good headstart on how to create your own simulations with `discoal` to generate your own training set for `diploSHIC.py`. 
-  
+
+### Calculating feature vectors from simulations
+Once you have simulation output, we need to compute summary statistics and feature vectors on those. To do that we will use `diploSHIC.py` in its fvecSim mode. These simulations are large so the computation will take a while. I usually do this on a cluster but to make things simple I'll give an example of launching all the jobs on a multicore machine
+```
+$ for f in exampleApplication/*.msOut.gz; do python diploSHIC.py fvecSim diploid $f $f.diploid.fvec --totalPhysLen 55000 --maskFileName exampleApplication/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP3.accessible.fa.gz --chrArmsForMasking 3R & done
+```
+this will launch all the jobs to the background. Go get lunch-- this will take a couple of hours to complete. 
+
+### Make a balanced training set 
+Once this is complete we will create a balanced training set (i.e. the same number of examples per class) using the helper script `makeTrainingSets.py`.
+```
+$ mkdir trainingSets
+$ python ./makeTrainingSets.py exampleApplication/neutral.msOut.gz.diploid.fvec exampleApplication/soft exampleApplication/hard 5 0,1,2,3,4,6,7,8,9,10 trainingSets/
+```
