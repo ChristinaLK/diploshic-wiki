@@ -61,9 +61,15 @@ this will launch all the jobs to the background. Go get lunch-- this will take a
 ### Make a balanced training set 
 Once this is complete we will create a balanced training set (i.e. the same number of examples per class) using the helper script `makeTrainingSets.py`.
 ```
+$ mkdir rawFVFiles && mv /scratch/ak917/exampleApplication/*.fvec rawFVFiles/
 $ mkdir trainingSets
-$ python ./makeTrainingSets.py exampleApplication/neutral.msOut.gz.diploid.fvec exampleApplication/soft exampleApplication/hard 5 0,1,2,3,4,6,7,8,9,10 trainingSets/
+$ python makeTrainingSets.py rawFVFiles/neut.msOut.gz.diploid.fvec rawFVFiles/soft \
+rawFVFiles/hard 5 0,1,2,3,4,6,7,8,9,10 trainingSets/
 ```
+et voila! our training sets are ready.
+
+### train diploS/HIC
+We will now move on to training a classifier. 
 
 ### feature vectors for example mosquito data
 
