@@ -2,7 +2,14 @@ In the normal workflow of supervised machine learning one creates a training set
 
 We have created a rather large directory that contains everything you need to replicate the mosquito genome results shown in Kern and Schrider (2018). The directory contains raw simulation output from `discoal` for hard and soft sweeps and regions unlinked to sweeps which condition upon the demographic model for the Burkino Faso sample (BFS) from our recent AG1000G consortium paper. It also contains a large VCF file of genotype data from that paper, a masking file which shows which regions of the genome were sequenced, and a simple text file that maps the individual sample IDs to populations to fish the relevant genotypes out of the VCF file. 
 
-Start by downloading the example directory like so
+Start by downloading and unpacking the example directory like so
 ```
-$ wget http://kerndev.rutgers.edu/~adk/diploSHIC/exampleApplication.tar.gz
+$ wget http://kerndev.rutgers.edu/~adk/diploSHIC/exampleApplication.tar.gz && tar zxvf exampleApplication.tar.gz
 ```
+The relevant files are as follows
+* ag1000g.phase1.ar3.pass.biallelic.3R.vcf.28000000-29000000.gz -- VCF genotype file for a region of Chr3R from AG1000G phase1
+* Anopheles-gambiae-PEST_CHROMOSOMES_AgamP3.accessible.fa.gz -- the masking file
+* samples_pops.txt -- file that maps individual samples to populations
+* hard_*.msOut.gz -- simulation for hard sweeps. the number refers to the subwindow where the sweep ocurred
+* soft_*.msOut.gz -- simulation for soft sweeps. the number is as above
+* neut.msOut.gz -- simulations for regions unlinked to sweeps
