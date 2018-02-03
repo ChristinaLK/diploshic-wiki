@@ -3,7 +3,7 @@ In the normal workflow of supervised machine learning one creates a training set
 
 We have created a rather large directory that contains everything you need to replicate the mosquito genome results shown in Kern and Schrider (2018). The directory contains raw simulation output from `discoal` for hard and soft sweeps and regions unlinked to sweeps which condition upon the demographic model for the Burkino Faso sample (BFS) from our recent AG1000G consortium paper. It also contains a large VCF file of genotype data from that paper, a masking file which shows which regions of the genome were sequenced, and a simple text file that maps the individual sample IDs to populations to fish the relevant genotypes out of the VCF file. 
 
-Start by downloading and unpacking the example directory like so
+Start by downloading and unpacking the example directory. Throughout this example I'm assuming that you are in the diploSHIC directory that you cloned from github
 ```
 $ wget http://kerndev.rutgers.edu/~adk/diploSHIC/exampleApplication.tar.gz && tar zxvf exampleApplication.tar.gz
 ```
@@ -47,7 +47,7 @@ discoal 162 2000 55000 -Pt 1750.204699 17502.046985 -Pre 19252.251684 57756.7550
 -en 0.025056 0 0.001776 -en 0.025204 0 0.007266 -en 0.026415 0 0.038498 \
 -ws 0 -Pa 2500.292426 250029.242646 -Pu 0.000000 0.000040 -x 0.5
 ```
-This is a bit ugly because of all the `-en` flags which specify the demographic size change history of the BFS sample. Ignore those for a minute and instead focus on the options before and after the demography. In particular you can see that `-x 0.5` has been given indicating that the hard sweep is at the middle of our simulated region. If instead we look in `hard_0.msOut.gz` there we set `-x 0.045454545454545456` indicating that the sweep occurred at the center of the leftmost subwindow.
+This is a bit ugly because of all the `-en` flags which specify the demographic size change history of the BFS sample, so I have added backslashes and line breaks to make it appear nicer on this wiki. Ignore those for a minute and instead focus on the options before and after the demography. In particular you can see that `-x 0.5` has been given indicating that the hard sweep is at the middle of our simulated region. If instead we look in `hard_0.msOut.gz` there we set `-x 0.045454545454545456` indicating that the sweep occurred at the center of the leftmost subwindow.
 
 Hopefully this simulation output will give you a very good headstart on how to create your own simulations with `discoal` to generate your own training set for `diploSHIC.py`. 
 
