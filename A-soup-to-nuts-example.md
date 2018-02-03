@@ -69,14 +69,59 @@ rawFVFiles/hard 5 0,1,2,3,4,6,7,8,9,10 trainingSets/
 et voila! our training sets are ready.
 
 ### train diploS/HIC
-We will now move on to training a classifier. 
+We will now move on to training a classifier. The hard work is done, so this step is rather simple. Training
+may take a while depending on your hardware setup. For things to go really fast a GPU would help, but a multicore 
+machine will do fine for our CNN
+```
+$ python diploSHIC.py train trainingSets/ trainingSets/ bfsModel
+```
+note that I have specified the feature vector files in `trainingSets/` to be used for
+both training and testing. This is fine, `diploSHIC.py` knows how to handle this. After
+18 epochs of training my optimization run is complete yielding the following
+```
+total time spent fitting and evaluating: 5230.030000 secs
+evaluation on test set:
+diploSHIC loss: 0.249277
+diploSHIC accuracy: 0.930000
+```
+which looks quite good. the trained model is stored in `bfsModel.json` and `bfsModel.weights.hdf5`. 
+That's it for training. Now lets apply this to real data.
 
 ### feature vectors for example mosquito data
-
+Applying the trained model has two steps: calculating feature vectors from data and then prediction from
+our trained CNN. `diploSHIC.py` will compute feature vectors from VCF files. We will do that on the 
+`ag1000g.phase1.ar3.pass.biallelic.3R.vcf.28000000-29000000.gz` file that is supplied in the `exampleApplication`
+directory.
 ```
 $ python diploSHIC.py fvecVcf diploid \
 exampleApplication/ag1000g.phase1.ar3.pass.biallelic.3R.vcf.28000000-29000000.gz 3R 53200684 \ exampleApplication/ag1000g.phase1.ar3.pass.biallelic.3R.vcf.28000000-29000000.gz.diploid.fvec \
 --targetPop BFS --sampleToPopFileName exampleApplication/samples_pops.txt --winSize 55000 \ 
 --maskFileName exampleApplication/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP3.accessible.fa.gz
 ```
-again that will take a while to run. 
+this will take a while to run, go hit the pool. Once complete `exampleApplication/ag1000g.phase1.ar3.pass.biallelic.3R.vcf.28000000-29000000.gz.diploid.fvec`
+has data that is ready to do prediction on
+
+### prediction on empirical feature vectors
+last step is to feed the feature vectors from the empirical data back to the trained CNN to 
+predict which regions of the genome fit into each of our five classes. This will be quite quick
+```
+$ python diploSHIC.py predict bfsModel.json bfsModel.weights.hdf5 rawFVFiles/ag1000g.phase1.ar3.pass.biallelic.3R.vcf.28000000-29000000.gz.diploid.fvec mossie.preds
+```
+Let's look at the output from that call
+```
+$ head mossie.preds
+chrom	classifiedWinStart	classifiedWinEnd	bigWinRange	predClass	prob(neutral)	prob(likedSoft)	prob(linkedHard)	prob(soft)	prob(hard)
+3R	28022501	28027500	28000001-28055000	linkedSoft	0.002331	0.997667	0.000002	0.000000	0.000000
+3R	28027501	28032500	28005001-28060000	linkedSoft	0.000168	0.999832	0.000000	0.000000	0.000000
+3R	28032501	28037500	28010001-28065000	linkedSoft	0.000116	0.999856	0.000027	0.000001	0.000000
+3R	28037501	28042500	28015001-28070000	linkedSoft	0.001110	0.998243	0.000539	0.000105	0.000002
+3R	28042501	28047500	28020001-28075000	soft	0.014143	0.219835	0.001996	0.758655	0.005371
+3R	28047501	28052500	28025001-28080000	linkedSoft	0.018158	0.743658	0.000130	0.237950	0.000102
+3R	28052501	28057500	28030001-28085000	linkedSoft	0.008697	0.617615	0.000480	0.372664	0.000545
+3R	28057501	28062500	28035001-28090000	linkedSoft	0.000932	0.998939	0.000123	0.000005	0.000000
+3R	28062501	28067500	28040001-28095000	linkedSoft	0.000031	0.999955	0.000014	0.000000	0.000000
+```
+Each row here represents a given window of the genome that has been classified. The predicted class is given
+along with the probabilities of class membership for that window for each of the five classes. 
+
+That's it! 
