@@ -64,3 +64,10 @@ Once this is complete we will create a balanced training set (i.e. the same numb
 $ mkdir trainingSets
 $ python ./makeTrainingSets.py exampleApplication/neutral.msOut.gz.diploid.fvec exampleApplication/soft exampleApplication/hard 5 0,1,2,3,4,6,7,8,9,10 trainingSets/
 ```
+
+### feature vectors for example mosquito data
+
+```
+$ python diploSHIC.py fvecVcf diploid exampleApplication/ag1000g.phase1.ar3.pass.biallelic.3R.vcf.28000000-29000000.gz 3R 53200684 exampleApplication/ag1000g.phase1.ar3.pass.biallelic.3R.vcf.28000000-29000000.gz.diploid.fvec --targetPop BFS --sampleToPopFileName exampleApplication/samples_pops.txt --winSize 55000 --maskFileName exampleApplication/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP3.accessible.fa.gz
+```
+again that will take a while to run. 
