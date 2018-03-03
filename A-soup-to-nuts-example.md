@@ -59,11 +59,11 @@ $ for f in exampleApplication/*.msOut.gz; do python diploSHIC.py fvecSim diploid
 this will launch all the jobs to the background. Go get lunch-- this will take a couple of hours to complete. 
 
 ### Make a balanced training set 
-Once this is complete we will create a balanced training set (i.e. the same number of examples per class) using the helper script `makeTrainingSets.py`.
+Once this is complete we will create a balanced training set (i.e. the same number of examples per class) using the `makeTrainingSets` mode within `diploSHIC.py`.
 ```
 $ mkdir rawFVFiles && mv /scratch/ak917/exampleApplication/*.fvec rawFVFiles/
 $ mkdir trainingSets
-$ python makeTrainingSets.py rawFVFiles/neut.msOut.gz.diploid.fvec rawFVFiles/soft \
+$ python diploSHIC.py makeTrainingSets rawFVFiles/neut.msOut.gz.diploid.fvec rawFVFiles/soft \
 rawFVFiles/hard 5 0,1,2,3,4,6,7,8,9,10 trainingSets/
 ```
 et voila! our training sets are ready.
