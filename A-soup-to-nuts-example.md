@@ -5,7 +5,7 @@ We have created a rather large directory that contains everything you need to re
 
 Start by downloading and unpacking the example directory. Throughout this example I'm assuming that you are in the diploSHIC directory that you cloned from github
 ```
-$ wget http://kerndev.rutgers.edu/~adk/diploSHIC/exampleApplication.tar.gz && tar zxvf exampleApplication.tar.gz
+$ wget http://sesame.uoregon.edu/~adkern/diploSHIC/exampleApplication.tar.gz && tar zxvf exampleApplication.tar.gz
 ```
 The relevant files are as follows
 * ag1000g.phase1.ar3.pass.biallelic.3R.vcf.28000000-29000000.gz -- VCF genotype file for a region of Chr3R from AG1000G phase1
