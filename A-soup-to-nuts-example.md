@@ -1,5 +1,5 @@
 ## diploSHIC usage
-In the normal workflow of supervised machine learning one creates a training set, trains an algorithm using that set, validates the accuracy of the trained algorithm, and then finally applies the trained algo to real data. We want to take you the user through that full process using `diploSHIC.py` here. 
+In the normal workflow of supervised machine learning one creates a training set, trains an algorithm using that set, validates the accuracy of the trained algorithm, and then finally applies the trained algo to real data. We want to take you the user through that full process using `diploSHIC` here. 
 
 We have created a rather large directory that contains everything you need to replicate the mosquito genome results shown in Kern and Schrider (2018). The directory contains raw simulation output from `discoal` for hard and soft sweeps and regions unlinked to sweeps which condition upon the demographic model for the Burkino Faso sample (BFS) from our recent AG1000G consortium paper. It also contains a large VCF file of genotype data from that paper, a masking file which shows which regions of the genome were sequenced, and a simple text file that maps the individual sample IDs to populations to fish the relevant genotypes out of the VCF file. 
 
@@ -49,12 +49,12 @@ discoal 162 2000 55000 -Pt 1750.204699 17502.046985 -Pre 19252.251684 57756.7550
 ```
 This is a bit ugly because of all the `-en` flags which specify the demographic size change history of the BFS sample, so I have added backslashes and line breaks to make it appear nicer on this wiki. Ignore those for a minute and instead focus on the options before and after the demography. In particular you can see that `-x 0.5` has been given indicating that the hard sweep is at the middle of our simulated region. If instead we look in `hard_0.msOut.gz` there we set `-x 0.045454545454545456` indicating that the sweep occurred at the center of the leftmost subwindow.
 
-Hopefully this simulation output will give you a very good headstart on how to create your own simulations with `discoal` to generate your own training set for `diploSHIC.py`. 
+Hopefully this simulation output will give you a very good headstart on how to create your own simulations with `discoal` to generate your own training set for `diploSHIC`. 
 
 ### Calculating feature vectors from simulations
-Once you have simulation output, we need to compute summary statistics and feature vectors on those. To do that we will use `diploSHIC.py` in its fvecSim mode. These simulations are large so the computation will take a while. I usually do this on a cluster but to make things simple I'll give an example of launching all the jobs on a multicore machine
+Once you have simulation output, we need to compute summary statistics and feature vectors on those. To do that we will use `diploSHIC` in its fvecSim mode. These simulations are large so the computation will take a while. I usually do this on a cluster but to make things simple I'll give an example of launching all the jobs on a multicore machine
 ```
-$ for f in exampleApplication/*.msOut.gz; do python diploSHIC.py fvecSim diploid $f $f.diploid.fvec --totalPhysLen 55000 --maskFileName exampleApplication/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP3.accessible.fa.gz --chrArmsForMasking 3R & done
+$ for f in exampleApplication/*.msOut.gz; do diploSHIC fvecSim diploid $f $f.diploid.fvec --totalPhysLen 55000 --maskFileName exampleApplication/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP3.accessible.fa.gz --chrArmsForMasking 3R & done
 ```
 this will launch all the jobs to the background. Go get lunch-- this will take a couple of hours to complete. 
 
@@ -63,7 +63,7 @@ Once this is complete we will create a balanced training set (i.e. the same numb
 ```
 $ mkdir rawFVFiles && mv /scratch/ak917/exampleApplication/*.fvec rawFVFiles/
 $ mkdir trainingSets
-$ python diploSHIC.py makeTrainingSets rawFVFiles/neut.msOut.gz.diploid.fvec rawFVFiles/soft \
+$ diploSHIC makeTrainingSets rawFVFiles/neut.msOut.gz.diploid.fvec rawFVFiles/soft \
 rawFVFiles/hard 5 0,1,2,3,4,6,7,8,9,10 trainingSets/
 ```
 et voila! our training sets are ready.
@@ -73,10 +73,10 @@ We will now move on to training a classifier. The hard work is done, so this ste
 may take a while depending on your hardware setup. For things to go really fast a GPU would help, but a multicore 
 machine will do fine for our CNN
 ```
-$ python diploSHIC.py train trainingSets/ trainingSets/ bfsModel
+$ diploSHIC train trainingSets/ trainingSets/ bfsModel
 ```
 note that I have specified the feature vector files in `trainingSets/` to be used for
-both training and testing. This is fine, `diploSHIC.py` knows how to handle this. After
+both training and testing. This is fine, `diploSHIC` knows how to handle this. After
 18 epochs of training my optimization run is complete yielding the following
 ```
 total time spent fitting and evaluating: 5230.030000 secs
@@ -89,11 +89,11 @@ That's it for training. Now lets apply this to real data.
 
 ### feature vectors for example mosquito data
 Applying the trained model has two steps: calculating feature vectors from data and then prediction from
-our trained CNN. `diploSHIC.py` will compute feature vectors from VCF files. We will do that on the 
+our trained CNN. `diploSHIC` will compute feature vectors from VCF files. We will do that on the 
 `ag1000g.phase1.ar3.pass.biallelic.3R.vcf.28000000-29000000.gz` file that is supplied in the `exampleApplication`
 directory.
 ```
-$ python diploSHIC.py fvecVcf diploid \
+$ diploSHIC fvecVcf diploid \
 exampleApplication/ag1000g.phase1.ar3.pass.biallelic.3R.vcf.28000000-29000000.gz 3R 53200684 \ exampleApplication/ag1000g.phase1.ar3.pass.biallelic.3R.vcf.28000000-29000000.gz.diploid.fvec \
 --targetPop BFS --sampleToPopFileName exampleApplication/samples_pops.txt --winSize 55000 \ 
 --maskFileName exampleApplication/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP3.accessible.fa.gz
@@ -105,7 +105,7 @@ has data that is ready to do prediction on
 last step is to feed the feature vectors from the empirical data back to the trained CNN to 
 predict which regions of the genome fit into each of our five classes. This will be quite quick
 ```
-$ python diploSHIC.py predict bfsModel.json bfsModel.weights.hdf5 rawFVFiles/ag1000g.phase1.ar3.pass.biallelic.3R.vcf.28000000-29000000.gz.diploid.fvec mossie.preds
+$ diploSHIC predict bfsModel.json bfsModel.weights.hdf5 rawFVFiles/ag1000g.phase1.ar3.pass.biallelic.3R.vcf.28000000-29000000.gz.diploid.fvec mossie.preds
 ```
 Let's look at the output from that call
 ```
