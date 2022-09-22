@@ -61,7 +61,7 @@ this will launch all the jobs to the background. Go get lunch-- this will take a
 ### Make a balanced training set 
 Once this is complete we will create a balanced training set (i.e. the same number of examples per class) using the `makeTrainingSets` mode within `diploSHIC.py`.
 ```
-$ mkdir rawFVFiles && mv /scratch/ak917/exampleApplication/*.fvec rawFVFiles/
+$ mkdir rawFVFiles && mv /path/to/exampleApplication/*.fvec rawFVFiles/
 $ mkdir trainingSets
 $ diploSHIC makeTrainingSets rawFVFiles/neut.msOut.gz.diploid.fvec rawFVFiles/soft \
 rawFVFiles/hard 5 0,1,2,3,4,6,7,8,9,10 trainingSets/
@@ -94,7 +94,8 @@ our trained CNN. `diploSHIC` will compute feature vectors from VCF files. We wil
 directory.
 ```
 $ diploSHIC fvecVcf diploid \
-exampleApplication/ag1000g.phase1.ar3.pass.biallelic.3R.vcf.28000000-29000000.gz 3R 53200684 \ exampleApplication/ag1000g.phase1.ar3.pass.biallelic.3R.vcf.28000000-29000000.gz.diploid.fvec \
+exampleApplication/ag1000g.phase1.ar3.pass.biallelic.3R.vcf.28000000-29000000.gz 3R 53200684 \ 
+exampleApplication/ag1000g.phase1.ar3.pass.biallelic.3R.vcf.28000000-29000000.gz.diploid.fvec \
 --targetPop BFS --sampleToPopFileName exampleApplication/samples_pops.txt --winSize 55000 \ 
 --maskFileName exampleApplication/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP3.accessible.fa.gz
 ```
